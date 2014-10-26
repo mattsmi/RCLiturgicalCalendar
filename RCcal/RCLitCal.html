@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+
+<title>Roman Catholic Liturgical Calendar</title>
+
+<!-- Basic Twitter Bootstrap stylesheet -->
+<link rel="stylesheet" href="../generic/css/bootstrap.css">
+
+<!-- Theme stylesheet -->
+<link rel="stylesheet" href="../generic/css/bootstrap-theme.css">
+
+<!-- Bootstrap JavaScript -->
+<script src="../generic/js/bootstrap.js"></script>
+
+<!-- Proper rendering and touch zooming -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script>
+	var iThisYear = new Date().getFullYear();
+	var iNextYear = iThisYear + 1;
+	var iNext2Year = iThisYear + 2;
+	var iNext3Year = iThisYear + 3;
+	var iNext4Year = iThisYear + 4;
+	var iNext5Year = iThisYear + 5;
+</script>
+<script>
+	function bodyLoad() {
+		document.getElementById("WaitMessage").style.visibility = "hidden";
+	}
+	function pleaseWait(bDoICAL) {
+		document.getElementById("WaitMessage").style.visibility = "visible";
+		var oElement = document.getElementById('iCalMenu');
+		oElement.value = bDoICAL;
+		//Refresh page to remove the Please Wait message
+		setTimeout(function(){
+			window.location.reload(1);
+		}, 5000);
+	}
+</script>
+</head>
+<body onload="bodyLoad()" onunload="bodyLoad()">
+	<div class="container">
+
+		<h1>Yearly Liturgical Calendar by Month</h1>
+		<h2>for the Liturgy of the Latin Rite of the Roman Catholic
+			Church</h2>
+		<p>&#xA0;</p>
+		<form class="form-horizontal" role="form" id="formCalSubmit"
+			method="post" action="GetRCLitCal.php">
+			<div class="form-group">
+				<label for="dateMenu" class="col-sm-2 control-label">Year of
+					Calendar</label>
+				<div class="col-sm-10">
+					<select name="dateMenu" id="dateMenu" class="form-control">
+						<script>
+									document
+											.write("<option value=\"" + iThisYear + "\"select>"
+													+ iThisYear + "</option>")
+								</script>
+						<script>
+									document
+											.write("<option value=\"" + iNextYear + "\">"
+													+ iNextYear + "</option>")
+								</script>
+						<script>
+									document
+											.write("<option value=\"" + iNext2Year + "\">"
+													+ iNext2Year + "</option>")
+								</script>
+						<script>
+									document
+											.write("<option value=\"" + iNext3Year + "\">"
+													+ iNext3Year + "</option>")
+								</script>
+						<script>
+									document
+											.write("<option value=\"" + iNext4Year + "\">"
+													+ iNext4Year + "</option>")
+								</script>
+						<script>
+									document.write(
+											"<option value=\"" + iNext5Year + "\">"
+													+ iNext5Year + "</option>")
+								</script>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="langMenu" class="col-sm-2 control-label">Language</label>
+				<div class="col-sm-10">
+					<select name="langMenu" id="langMenu" class="form-control">
+						<option value="en" selected>English</option>
+						<option value="la">Latin</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="calMenu" class="col-sm-2 control-label">Local or
+					General Calendar</label>
+				<div class="col-sm-10">
+					<select name="calMenu" id="calMenu" class="form-control">
+						<option value="GEN" selected>
+						General Roman Calendar</option>
+						<option value="AU">The Local Calendar of Australia</option>
+						<option value="ENG">The Local Calendar of England</option>
+						<option value="IE">The Local Calendar of Ireland</option>
+						<option value="NZ">The Local Calendar of New Zealand</option>
+						<option value="SCT">The Local Calendar of Scotland</option>
+						<option value="US">The Local Calendar of the USA</option>
+						<option value="WLS">The Local Calendar of Wales</option>
+					</select>
+				</div>
+			</div>
+			<div class="hidden">
+				<div class="form-group">
+					<select name="monthMenu" id="monthMenu" class="form-control">
+						<option value="1" selected>January</option>
+					</select>
+				</div>
+			</div>
+			<div class="hidden">
+				<div class="form-group">
+					<select name="edmMenu" id="edmMenu" class="form-control">
+						<option value="3" selected>Western Church (Gregorian
+							Easter)</option>
+					</select>
+				</div>
+			</div>
+			<div class="hidden">
+				<div class="form-group">
+					<select name="iCalMenu" id="iCalMenu" class="form-control">
+						<option value="0">Only view the calendar</option>
+						<option value="1" selected>Create iCalender of the feasts</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button class="btn btn-default" id="getYearlyCalendar"
+						onclick="pleaseWait('0')" type="submit">Display Yearly
+						Calendar</button>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button class="btn btn-default" id="getRCiCal"
+						onclick="pleaseWait('1')" type="submit">Download iCalendar of Feasts</button>
+				</div>
+			</div>
+
+		</form>
+		<p>&#xA0;</p>
+
+		<div id="WaitMessage">
+			<h1>Please wait a second or two for the calculation ...</h1>
+		</div>
+
+	</div>
+
+</body>
+</html>

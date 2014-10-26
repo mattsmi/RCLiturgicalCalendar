@@ -1,0 +1,215 @@
+@charset "UTF-8";
+
+* {
+	margin: 0;
+	padding: 0;
+	text-align: right;
+	vertical-align: top;
+	visibility: visible;
+	direction: rtl;
+}
+
+body {
+	font-family: "Traditional Arabic"; 
+	color: #000000;
+	background-color: transparent;	
+	font-size: 100.01%;     /* decimal fontsize fixing font resizing bug in IE5/6 */
+	padding: inherit; /* 5px 7px 5px 7px; */
+	margin-left: 2em;
+	margin-right: 2em;
+}
+
+img, embed, object, video {
+	max-width: 100%;
+}
+
+a {
+	color: #000000;
+	text-decoration: underline;
+}
+
+a:hover {
+	color: #ef600f;
+	text-decoration: none;
+}
+
+ul li a:hover{
+	color: #ef600f;
+	text-decoration: none;
+	background-color: #ffffff;
+}
+
+a:focus {
+	color: #ef600f;
+	text-decoration: underline;
+}
+
+h1 {
+	margin-top: 1.0cm;
+	margin-bottom: 0.21cm;
+	direction: rtl;
+	color: #000000;
+	line-height: 0.42cm;
+	text-align: justify;
+	widows: 2;
+	orphans: 2;
+	font-family: "Traditional Arabic";
+	font-size: 18pt;
+	page-break-before: always;
+	/* text-transform: capitalize; Assume capitalisation already correct. */
+}
+
+h1.page_title {
+	margin-top: 0.21cm;
+	text-align: center;
+	page-break-before: auto;
+	font-weight: bold;
+	font-size: 24pt
+}
+
+h2, h3, h4, h5, h6 {
+	color: #000000;
+	margin-bottom: 0.21cm;
+	line-height: 0.42cm;
+	font-weight: bold;
+	text-align: right;
+	widows: 2;
+	orphans: 2;
+	page-break-before: auto;
+	padding-top: 1em;
+	font-family: "Traditional Arabic";
+}
+
+h2 {
+	font-size: 16pt;
+	text-transform: capitalize
+}
+
+h3 {font-size: 15pt;}
+
+h4, h5, h6 {font-size: 1em;}
+
+p {
+	margin-bottom: 0.21cm;
+	direction: rtl;
+	color: #000000;
+	line-height: 0.44cm;
+	text-align: right;
+	margin-left: 7em;
+	text-indent: -3em;
+	widows: 2;
+	orphans: 2;
+	font-family: "Simplified Arabic";
+	font-size: 13pt;
+}
+
+p.instruct_people {
+	margin: 12.0pt 0 6.0pt 0;
+	text-align: left;
+	page-break-after: avoid;
+	font-size: 14.0pt;
+	font-family: "Traditional Arabic";
+	text-transform: uppercase;
+	font-weight: bold;
+}
+
+p.psalm {
+	margin-left: 1.5cm;
+	text-indent: -0.5cm;
+	margin-bottom: 0cm;
+	line-height: 100%;
+	font-family: "Simplified Arabic";
+}
+
+p.quietly {
+	color: #808080;
+	font-style: italic;
+}
+
+p.reflist {
+	margin-left: 1.27cm;
+	text-indent: -1.27cm;
+	font-family: "Simplified Arabic";
+	font-size: 12pt;
+	page-break-before: auto 
+}
+
+p.rubrical, p.rubric {
+	font-family: "Traditional Arabic";
+	font-style: italic;
+	font-weight: bold;
+	color: #FF0000;
+	font-size: 12pt;
+}
+
+p.rubric {
+	page-break-after: avoid;
+	margin-left: 0cm;
+	text-indent: 0cm;
+}
+
+p.speaker {
+	font-size: 12pt;
+	font-family: "Traditional Arabic";
+	float: right;
+	margin-left: 2em;
+}
+
+p.prayer_sheet {
+	text-align: center;
+}
+
+.prayer_sheet {
+	font-family: "Traditional Arabic";
+	font-style: normal;
+	font-weight: bold;
+	background:#F3F3F3;
+	color: #151B8D;
+	font-size: 12pt;
+	text-align: center;
+	border-style: solid;
+	border-color: #000000;
+	border-width: thin;
+}
+
+.rubrical {
+	font-family: "Traditional Arabic";
+	font-style: italic;
+	font-weight: bold;
+	color: #FF0000;
+	font-size: 12pt;
+	
+}
+
+.speaker {
+	font-size: 12pt;
+	font-family: "Traditional Arabic";
+	color: #606060;
+}
+
+ol, ul {margin: 0 0 1em 2em;}
+
+table {
+	border-collapse: collapse;
+	border: solid;
+	border-color: #000000;
+	vertical-align: text-top;
+	/* margin-left and margin-right both set to auto will centre the table. */
+	margin-left: auto;
+	margin-right: auto;
+}
+
+caption {
+	margin-bottom: 0.6em;
+	font-size: 0.8em;
+	font-weight: normal;
+	text-align: center;
+	font-family: "Traditional Arabic";
+}
+th, tr, td {
+	padding: 3px;
+	border: inset;
+}
+
+/* Styles for general use. */
+.nevidebla {visibility: hidden;  display: none;}
