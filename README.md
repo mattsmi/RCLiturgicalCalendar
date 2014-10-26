@@ -21,4 +21,4 @@ To implement the whole system as it is today, you will need:
 
 I have also set up a cron job to check whether the Python ZMQ server is still running, and to relaunch it, if it is not running. Another weekly job kills the Python ZMQ server process to allow the system to clean up.
 
-A running copy of the system can be found here: (Roman Catholic Liturgical Calendar)[http://www.liturgy.guide/RCcal/RCLitCal.html].
+A running copy of the system can be found here: [Roman Catholic Liturgical Calendar](http://www.liturgy.guide/RCcal/RCLitCal.html).
