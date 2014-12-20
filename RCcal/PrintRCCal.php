@@ -42,11 +42,9 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 	echo ('<meta name="viewport" content="width=device-width, initial-scale=1">' . "\n");
 	
 	echo ("<script>\n");
-	echo ('function submitLastMonth() {' . "\n");
-	echo (' document.forms["formLastMonth"].submit();' . "\n");
-	echo ('}' . "\n");
-	echo ('function submitNextMonth() {' . "\n");
-	echo (' document.forms["formNextMonth"].submit();' . "\n");
+	echo ('function submitSpecificMonth(iMonthWanted) {' . "\n");
+	echo (' document.getElementsByName("monthMenu")[0].value = iMonthWanted;' . "\n");
+	echo (' document.forms["formSpecificMonth"].submit();' . "\n");
 	echo ('}' . "\n");
 	echo ("</script>\n");
 	echo ("</head>\n");
@@ -54,13 +52,13 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 	echo ('<div class="container"><div id="page">' . "\n");
 	echo ('<div class="box">' . "\n");
 	echo ('<div class="body">' . "\n");
-	echo ('<div class="calendar current-month">' . "\n");
+	echo ('<div class="calendar current-month myDivToPrint">' . "\n");
 	echo ('<div class="calendar-head">' . "\n");
 	echo ('<ul class="calendar-menu">' . "\n");
 	echo ('<li class="current"><a href="RCLitCal.html">' . pGetKnownTranslation ( "Menu" ) . "</a></li>\n");
 	if ($iMonth != 1) {
 		echo ('<li class="current">' . "\n");
-		echo ('<a href="javascript: submitLastMonth()">' . pGetKnownTranslation ( "Previous Month" ) . '</a>' . "\n");
+		echo ('<a href="javascript: submitSpecificMonth(' . ($iMonth - 1) . ')">' . pGetKnownTranslation ( "Previous Month" ) . '</a>' . "\n");
 	} else {
 		echo ('<li>' . "\n");
 		echo ('<a id="noPrev">' . pGetKnownTranslation ( "Previous Month" ) . '</a>' . "\n");
@@ -69,7 +67,7 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 	echo ('</li>' . "\n");
 	if ($iMonth != 12) {
 		echo ('<li class="current">' . "\n");
-		echo ('<a href="javascript: submitNextMonth()">' . pGetKnownTranslation ( "Next Month" ) . '</a>' . "\n");
+		echo ('<a href="javascript: submitSpecificMonth(' . ($iMonth + 1) . ')">' . pGetKnownTranslation ( "Next Month" ) . '</a>' . "\n");
 	} else {
 		echo ('<li>' . "\n");
 		echo ('<a id="NoNext">' . pGetKnownTranslation ( "Next Month" ) . '</a>' . "\n");
@@ -80,7 +78,22 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 	
 	// Month header
 	$sTemp = pFormatMonthYearDate ( $dMonthStart, $sLang );
-	echo ('<h2>' . $sTemp . '&#xA0;&#xA0;&#xA0;' . $sCalendarChosen . '</h2>' . "\n</div>\n");
+	echo ('<h2>' . $sTemp . '&#xA0;&#xA0;&#xA0;' . $sCalendarChosen . '</h2>');
+	echo ('<ul  class="calendar-menu">');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'1\')">' . pFormatMonthFromNum(1, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'2\')">' . pFormatMonthFromNum(2, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'3\')">' . pFormatMonthFromNum(3, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'4\')">' . pFormatMonthFromNum(4, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'5\')">' . pFormatMonthFromNum(5, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'6\')">' . pFormatMonthFromNum(6, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'7\')">' . pFormatMonthFromNum(7, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'8\')">' . pFormatMonthFromNum(8, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'9\')">' . pFormatMonthFromNum(9, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'10\')">' . pFormatMonthFromNum(10, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'11\')">' . pFormatMonthFromNum(11, $sLang) . '</a></li>');
+	echo ('<li><a href="javascript: submitSpecificMonth(\'12\')">' . pFormatMonthFromNum(12, $sLang) . '</a></li>');
+	echo ('</ul>');
+	echo ( "\n</div>\n");
 	echo ('<table>' . "\n<thead>\n<tr>\n");
 	// Get the Day of Week header
 	$iCol = 0;
@@ -246,7 +259,7 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 	
 	// Populate any empty cells after the end of the month
 	$bNeedTR = False;
-	if (($iCol < 6) && ($iCol != 0)) {
+	if (($iCol < 7) && ($iCol != 0)) {
 		$bNeedTR = True;
 		while ( $iCol <= 6 ) {
 			echo ('<td class="next-month-day"><span><a id="dummy' . $iCol . '">&#xA0;</a></span></td>' . "\n");
@@ -259,23 +272,15 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 		// finalise the table and divisions
 	echo ("</tbody>\n</table>\n</div>\n</div>\n</div>\n</div>\n");
 	
-	// Hidden form to get the last month
-	echo ('<form id="formLastMonth" method="post" action="GetRCLitCal.php">' . "\n");
+
+	// Hidden form to get a specific month
+	echo ('<form id="formSpecificMonth" method="post" action="GetRCLitCal.php">' . "\n");
 	echo ('<input type="hidden" name="dateMenu" value="' . $iYear . '" />' . "\n");
 	echo ('<input type="hidden" name="langMenu" value="' . $sLang . '" />' . "\n");
 	echo ('<input type="hidden" name="edmMenu" value="' . $iEDM . '" />' . "\n");
 	echo ('<input type="hidden" name="calMenu" value="' . $sCalendarChosen . '" />' . "\n");
 	echo ('<input type="hidden" name="iCalMenu" value="' . $GLOBALS ['bDoICAL'] . '" />' . "\n");
-	echo ('<input type="hidden" name="monthMenu" value="' . ($iMonth - 1) . '" />' . "\n");
-	echo ("</form>\n");
-	// Hidden form to get the next month
-	echo ('<form id="formNextMonth" method="post" action="GetRCLitCal.php">' . "\n");
-	echo ('<input type="hidden" name="dateMenu" value="' . $iYear . '" />' . "\n");
-	echo ('<input type="hidden" name="langMenu" value="' . $sLang . '" />' . "\n");
-	echo ('<input type="hidden" name="edmMenu" value="' . $iEDM . '" />' . "\n");
-	echo ('<input type="hidden" name="calMenu" value="' . $sCalendarChosen . '" />' . "\n");
-	echo ('<input type="hidden" name="iCalMenu" value="' . $GLOBALS ['bDoICAL'] . '" />' . "\n");
-	echo ('<input type="hidden" name="monthMenu" value="' . ($iMonth + 1) . '" />' . "\n");
+	echo ('<input type="hidden" name="monthMenu" value="0" />' . "\n");
 	echo ("</form>\n");
 	
 	// End of the HTML page

@@ -8,8 +8,6 @@ if (! defined ( 'page_include_allowed' )) {
 	exit ();
 }
 
-#include '../generic/MattaUtils/MattaGlobals.php';
-
 function pCreateICAL($iYear, $sLang, $iEDM, $sCalendarChosen, $sRCorByz) {
 	if ($sRCorByz == 'RC') {
 		$sFileName = 'RCcal' . $sCalendarChosen . $iYear . $sLang . '.ics';
@@ -41,7 +39,11 @@ function pCreateICAL($iYear, $sLang, $iEDM, $sCalendarChosen, $sRCorByz) {
 	$sICSfile .= "BEGIN:VCALENDAR\r\n";
 	$sICSfile .= "VERSION:2.0\r\n";
 	// Include UTF-8 character early to ensure correct encoding upon read.
-	$sICSfile .= "PRODID:-//Roman Catholic Church//Liturgical Calendar Ecclesiæ//" . strtoupper ( $sLang ) . "\r\n";
+	if ($sRCorByz == 'RC') {
+		$sICSfile .= "PRODID:-//Roman Catholic Church//Liturgical Calendar Ecclesiæ//" . strtoupper ( $sLang ) . "\r\n";
+	} else {
+		$sICSfile .= "PRODID:-//Eastern Orthodox or Byzantine Catholic//Liturgical Calendar Ecclesiæ//" . strtoupper ( $sLang ) . "\r\n";
+	}
 	if ($iEDM == 1) {
 		$sICSfile .= "CALSCALE:JULIAN\r\n";
 	} else {
@@ -139,13 +141,64 @@ function pCreateICAL($iYear, $sLang, $iEDM, $sCalendarChosen, $sRCorByz) {
 				$sTemp = $dTemp->format('Ymd');
 				$sICSfile .= "DTEND;VALUE=DATE:" . $sTemp . "\r\n";
 				$sICSfile .= "LOCATION:RC\r\n";
-				$sLongFeastName = 'Feast_' . $sLang;
-				$sICSfile .= "SUMMARY:" . pCleanTextForICAL ( $result2 [$sLongFeastName] ) . "\r\n";
+				$sShortFeastName = 'Short_name_' . $sLang;
+				$sICSfile .= "SUMMARY:" . pCleanTextForICAL ( $result2 [$sShortFeastName] ) . "\r\n";
 				$sICSfile .= "DESCRIPTION:" . pCleanTextForICAL($sBody, 1) . "\r\n";
 				// finalise the event
 				$sICSfile .= "CLASS:PRIVATE\r\nTRANSP:TRANSPARENT\r\nEND:VEVENT\r\n";
 			}
 			
+		}
+	} else {
+		//We process the Byzantine calendar details here.
+		//   The table to use for source data varies according to the Easter Dating Method
+		if($iEDM == 2)
+		{
+			$CalTable = "OrthodoxCal";
+			$sWhichEasterMethod = "Calendar using Orthodox Easter";
+		} elseif($iEDM == 1)
+		{
+			$CalTable = "JulianCal";
+			$sWhichEasterMethod = "Calculating Easter according to the Julian Calendar";
+		} else {
+			//default value is Western Easter
+			$CalTable = "Cal";
+			$sWhichEasterMethod = "Calculating Easter according to the Gregorian Calendar";
+		}
+		$sTempSQL = "select rowid, * from " . $CalTable . " where Date_this_year like '" . $iYear . "%' order by Date_this_year asc";
+		$stmt = $GLOBALS['dbMelkTexts']->prepare($sTempSQL);
+		$stmt->execute();
+		$result = $stmt->fetchAll();
+		//  loop through the year
+		foreach ($result as $entry) {
+			if($entry['Print_on_Cal_with_Sun123']) {
+				// Create the body of the event description
+				$sBody = "";
+				// Full name of feast
+				$sLongFeastName = 'Feast_' . $sLang;
+				$sBody .= $entry [$sLongFeastName] . "\n";
+				if(mb_strlen($entry['Trad_Fasting']) > 0) 
+					$sBody .= pGetKnownTranslation($entry['Trad_Fasting']) . "\n";
+				if(mb_strlen($entry['Tone']) > 0)
+					$sBody .= pGetKnownTranslation("Tone of Week:") . " " . $entry['Tone'] . "\n";
+				
+				// Create the event
+				$sICSfile .= "BEGIN:VEVENT\r\n";
+				$sICSfile .= "DTSTAMP:" . date ( "Ymd" ) . "T" . date ( "His" ) . "Z" . "\r\n";
+				$sTemp = str_replace ( "-", "", $entry ['Date_this_year'] );
+				$sICSfile .= "DTSTART;VALUE=DATE:" . $sTemp . "\r\n";
+				$sICSfile .= "UID:" . $sTemp . "@" . sprintf ( '%04d', $entry ['rowid'] ) . "\r\n";
+				$dTemp = new DateTime($entry ['Date_this_year']);
+				$dTemp->add(new DateInterval('P1D'));
+				$sTemp = $dTemp->format('Ymd');
+				$sICSfile .= "DTEND;VALUE=DATE:" . $sTemp . "\r\n";
+				$sICSfile .= "LOCATION:Byzantine\r\n";
+				$sShortFeastName = 'Short_name_' . $sLang;
+				$sICSfile .= "SUMMARY:" . pCleanTextForICAL ( $entry [$sShortFeastName] ) . "\r\n";
+				$sICSfile .= "DESCRIPTION:" . pCleanTextForICAL($sBody, 1) . "\r\n";
+				// finalise the event
+				$sICSfile .= "CLASS:PRIVATE\r\nTRANSP:TRANSPARENT\r\nEND:VEVENT\r\n";
+			}
 		}
 	}
 	$sICSfile .= "END:VCALENDAR\r\n";

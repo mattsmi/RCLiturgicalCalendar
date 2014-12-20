@@ -80,6 +80,33 @@ function pFormatMonthYearDate($dDate, $sLang)
 	return $sTempDate;
 }
 
+function pFormatMonthFromNum($iMonth, $sLang)
+{
+	//Change locale to get translated dates
+	//The following two PHP commands should work, but locales cannot
+	//   be guaranteed to be present. Hence we do this ourselves.
+	//   setlocale(LC_TIME, $GLOBALS['sHTMLlocale'] . '.utf8');
+	//   $sTemp = strftime("%B %Y");
+
+	$stmtD = $GLOBALS['dbMelkTexts']->prepare("select " . $sLang . " from TransCalMonths where MonthNum = ?");
+	$stmtD->execute(array($iMonth));
+	$resultD = $stmtD->fetchAll();
+	$sTempDate = $resultD[0][$sLang];
+	if($sLang == 'ar')
+	{
+		//Add the modern Arabic month name as well, to avoid confusion.
+		$stmtD2 = $GLOBALS['dbMelkTexts']->prepare("select eg from TransCalMonths where MonthNum = ?");
+		$stmtD2->execute(array($iMonth));
+		$resultD2 = $stmtD2->fetchAll();
+		$sTempDate2 = $resultD2[0]['eg'];
+		$sTempDate = $sTempDate . " (" . $sTempDate2 . ") ";
+	} else {
+		$sTempDate = $sTempDate;
+	}
+
+	return $sTempDate;
+}
+
 function pFormatWeekdayDate($dDate, $sLang)
 {
 	//Change locale to get translated dates
