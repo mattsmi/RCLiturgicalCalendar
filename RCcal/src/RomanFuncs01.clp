@@ -73,7 +73,7 @@
 (deffunction isThisALeapYear
     (?baseYear)
     
-    ;As a yardstick, knowing that dates are expressed as an integer number of seconds
+    ;Due to assuming that dates are expressed as an integer number of seconds
     ;   after 01 January 1970, 00.00 UTC, we accept no date earlier than that.
     ;We assume the following definition of a Leap Year (or intercalary or bissextile year),
     ;   as defined in the Gregorian Calendar:
@@ -109,6 +109,39 @@
     ;If not a leap year, we fall out here.
     (return FALSE)
     
+)
+
+(deffunction isThisAnOLeapYear
+    (?baseYear)
+    ;Orthodox Leap Year or Revised Julian Leap Year:
+    ; if year divisible by 100, then if remainder 200 or 600, when divided by 900
+    ; if year divisible by 4, but not 100.
+    
+     ;Check that the argument is numeric
+    (if (not (integerp ?baseYear)) then
+        (return nil)
+    )
+    ;Check for legal values
+    (if (< ?baseYear 1970) then
+        (return nil)
+    )
+    
+    ;Check for centuries
+    (if (= (mod ?baseYear 100) 0) then
+	(if (or (= (mod ?baseYear 900) 200) (= (mod ?baseYear 900) 600)) then
+	    (return TRUE)
+	else
+	    (return FALSE)
+	)
+    )
+    
+    (if (= (mod ?baseYear 4) 0) then
+        ;We have a leap year that is not a century.
+        (return TRUE)
+    )
+    
+    ;If not a leap year, we fall out here.
+    (return FALSE)
 )
 
 (deffunction yearFromDateINT
@@ -717,7 +750,7 @@
     (bind ?iYear (yearFromDateINT ?dDate))
     (bind ?iMonth (monthFromDateINT ?dDate))
     (bind ?iDay (dayFromDateINT ?dDate))
-       
+
     (if (< ?iMonth 3) then
         (bind ?iMonth (+ ?iMonth 12))
         (bind ?iYear (- ?iYear 1))
@@ -738,14 +771,14 @@
     )
     
     
-    ;Make Sunday 7, not 0, to align with ISO 8601 (and Tcl) standards.
+    ;Make Sunday 7, not 0, to align with ISO 8601, CLIPS, and Tcl interpretation.
     (if (= ?iCalcDay 0) then
         (bind ?iCalcDay 7)
     else
         ?iCalcDay
     )
     
-    ?iCalcDay
+    
 )
 
 (deffunction clFindSun
@@ -841,7 +874,7 @@
     
     ;We assume the base date to be an integer number of seconds.
     ;This is the usual case on a UNIX system, or as sent in from Tcl.
-    ;In Python, we 'import time' and then use 'time.time()' to report a similar number of seconds as does Tcl.
+    ;In Python, we 'import time' and then use 'time.time()' to report a similar number of seconds.
     ;It usually expresses time as an integer number of seconds after the
     ;   Epoch Date of 01 January 1970, 00.00 UTC.
     
@@ -957,4 +990,219 @@
     (bind ?Counter (+ ?Counter (* (- ?baseDay 1) 24 60 60)))
     
     (return ?Counter)
+)
+
+(deffunction string-to-integer
+    (?sNumber)
+    
+
+    ;We assume a string of integers only.
+    ; As soon as we strike a character that is not an integer, bail and return nil.
+    (bind ?iLen (str-length ?sNumber))
+    (bind ?iNum 0)
+    (bind ?iCount ?iLen)
+    (while (> ?iCount 0)
+	(switch (sub-string ?iCount ?iCount ?sNumber)
+	    (case "0" then (bind ?iDigit 0))
+	    (case "1" then (bind ?iDigit 1))
+	    (case "2" then (bind ?iDigit 2))
+	    (case "3" then (bind ?iDigit 3))
+	    (case "4" then (bind ?iDigit 4))
+	    (case "5" then (bind ?iDigit 5))
+	    (case "6" then (bind ?iDigit 6))
+	    (case "7" then (bind ?iDigit 7))
+	    (case "8" then (bind ?iDigit 8))
+	    (case "9" then (bind ?iDigit 9))
+	    (default (return nil))
+	)
+	;Get the sum of each newly found digit multiplied by the appropriate power of ten.
+	(bind ?iNum (+ (integer (* ?iDigit (** 10 (- ?iLen ?iCount)))) ?iNum))
+	(bind ?iCount (- ?iCount 1))
+    )
+    
+    ?iNum
+)
+
+(deffunction floor
+    (?iBaseNum)
+    ;This function is not available in the standard mathematics library in CLIPS.
+    
+    ;Check that the argument is numeric
+    (if (and (not (integerp ?iBaseNum)) (not (floatp ?iBaseNum))) then
+        (return nil)
+    )
+    
+    ;If zero, then return zero
+    (if(= ?iBaseNum 0) then
+	(return ?iBaseNum)
+    )
+    
+    ;If the number is positive, just return the result of integer division
+    (if (> ?iBaseNum 0) then
+	(return (div ?iBaseNum 1))
+    )
+    
+    ;If the number is negative, if the modulus of the number by one is zero, return the number, else subtract 1.
+    (if (< ?iBaseNum 0) then
+	(if (= (mod ?iBaseNum 1) 0) then
+	    (return (div ?iBaseNum 1))
+	else
+	    (return (- (div ?iBaseNum 1) 1))
+	)
+    )
+)
+
+(deffunction CalcDayDiffJulianCal
+    (?dDate)
+    
+    ;Find the days difference between the passed-in Gregorian date and the Julian date
+    ;  Find the hundreds part of the year
+    (bind ?sYearHundreds (sub-string 1 2 (unmakeDate ?dDate)))
+    ;We need 1.25 to round to 1, and -1.25 to round to -2 -- i.e. floor or integer division function.
+    (bind ?iYearHundreds (string-to-integer ?sYearHundreds))
+    (bind ?iFlooredValue (floor (/ ?iYearHundreds 4)))
+    (if (< ?iYearHundreds 0) then
+	;Create a real floored value, not just the result of integer division
+	(bind ?iFlooredValue (- ?iFlooredValue 1))
+    )
+    (bind ?iDaysDiff (- ?iYearHundreds ?iFlooredValue 2))
+    (return ?iDaysDiff)
+
+)
+
+(deffunction pGregorianToCJDN
+    (?baseYear ?baseMonth ?baseDay)
+    ;The Chronological Julian Day Number is a whole number representing a day.
+    ;  It's day begins at 00:00 Local Time.
+    ;The zero point for a Julian Date (JD 0.0) corresponds to 12.00 UTC, 1 January -4712.
+    ; The zero point for the CJDN is 1 January -4712 (the whole day in local time).
+    ;From: http://aa.quae.nl/en/reken/juliaansedag.html .
+    
+    (bind ?iC0 (floor (/ (- ?baseMonth 3) 12)))
+    (bind ?iX4 (+ ?baseYear ?iC0))
+    (bind ?iX3 (floor (/ ?iX4 100)))
+    (bind ?iX2 (mod ?iX4 100))
+    (bind ?iX1 (- ?baseMonth (* 12 ?iC0) 3))
+    (bind ?iJ (+ (floor (/ (* 146097 ?iX3) 4)) (floor (/ (* 36525 ?iX2) 100)) (floor (/ (+ (* 153 ?iX1) 2) 5)) ?baseDay 1721119))
+    
+    (return (round ?iJ))
+)
+
+(deffunction pCJDNToGregorian
+    (?iCJDN)
+
+    (bind ?iK3 (+ (* 4 (- ?iCJDN 1721120)) 3))
+    (bind ?iX3 (floor (/ ?iK3 146097)))
+    (bind ?iK2 (+ (* 100 (floor (/ (mod ?iK3 146097) 4))) 99))
+    (bind ?iX2 (floor (/ ?iK2 36525)))
+    (bind ?iK1 (+ (* (floor (/ (mod ?iK2 36525) 100)) 5) 2))
+    (bind ?iX1 (floor (/ ?iK1 153)))
+    (bind ?iC0 (floor (/ (+ ?iX1 2) 12)))
+    (bind ?iYear (+ (* 100 ?iX3) ?iX2 ?iC0))
+    (bind ?iMonth (+ (- ?iX1 (* 12 ?iC0)) 3))
+    (bind ?iDay (+ (floor (/ (mod ?iK1 153) 5)) 1))
+    
+    (return (mkDate ?iYear ?iMonth ?iDay))
+)
+
+(deffunction pMilankovicToCJDN
+    (?baseYear ?baseMonth ?baseDay)
+    ;The Chronological Julian Day Number is a whole number representing a day.
+    ;  It's day begins at 00:00 Local Time.
+    ;The zero point for a Julian Date (JD 0.0) corresponds to 12.00 UTC, 1 January -4712.
+    ; The zero point for the CJDN is 1 January -4712 (the whole day in local time).
+    ;From: http://aa.quae.nl/en/reken/juliaansedag.html .
+    
+    (bind ?iC0 (floor (/ (- ?baseMonth 3) 12)))
+    (bind ?iX4 (+ ?baseYear ?iC0))
+    (bind ?iX3 (floor (/ ?iX4 100)))
+    (bind ?iX2 (mod ?iX4 100))
+    (bind ?iX1 (- ?baseMonth (* 12 ?iC0) 3))
+    (bind ?iJ (+ (floor (/ (+ (* 328718 ?iX3) 6) 9)) (floor (/ (* 36525 ?iX2) 100)) (floor (/ (+ (* 153 ?iX1) 2) 5)) ?baseDay 1721119))
+    
+    (return (round ?iJ))
+)
+
+(deffunction pCJDNToMilankovic
+    (?iCJDN)
+
+    (bind ?iK3 (+ (* 9 (- ?iCJDN 1721120)) 2))
+    (bind ?iX3 (floor (/ ?iK3 328718)))
+    (bind ?iK2 (+ (* 100 (floor (/ (mod ?iK3 328718) 9))) 99))
+    (bind ?iX2 (floor (/ ?iK2 36525)))
+    (bind ?iK1 (+ (* (floor (/ (mod ?iK2 36525) 100)) 5) 2))
+    (bind ?iX1 (floor (/ (+ (* (floor (/ (mod ?iK2 36525) 100)) 5) 2) 153)))
+    (bind ?iC0 (floor (/ (+ ?iX1 2) 12)))
+    (bind ?iYear (+ (* 100 ?iX3) ?iX2 ?iC0))
+    (bind ?iMonth (+ (- ?iX1 (* 12 ?iC0)) 3))
+    (bind ?iDay (+ (floor (/ (mod ?iK1 153) 5)) 1))
+    
+    (return (mkDate ?iYear ?iMonth ?iDay))
+)
+
+(deffunction pJulianToCJDN
+    (?baseYear ?baseMonth ?baseDay)
+    
+    (bind ?iJ0 1721117)
+    (bind ?iC0 (floor (/ (- ?baseMonth 3) 12)))
+    (bind ?iJ1 (floor (/ (* 1461 (+ ?baseYear ?iC0)) 4)))
+    (bind ?iJ2 (floor (/ (- (* 153 ?baseMonth) (* 1836 ?iC0) 457) 5)))
+    (bind ?iJ (+ ?iJ1 ?iJ2 ?baseDay ?iJ0))
+    (return (round ?iJ))
+)
+
+(deffunction pCJDNToJulian
+    (?iCJDN)
+
+    (bind ?iY2 (- ?iCJDN 1721118))
+    (bind ?iK2 (+ (* 4 ?iY2) 3))
+    (bind ?iK1 (+ (* 5 (floor (/ (mod ?iK2 1461) 4))) 2))
+    (bind ?iX1 (floor (/ ?iK1 153)))
+    (bind ?iC0 (floor (/ (+ ?iX1 2) 12)))
+    (bind ?iYear (+ (floor (/ ?iK2 1461)) ?iC0))
+    (bind ?iMonth (+ (- ?iX1 (* 12 ?iC0)) 3))
+    (bind ?iDay (round (+ (floor (/ (mod ?iK1 153) 5)) 1)))
+    
+    (return (mkDate ?iYear ?iMonth ?iDay))
+)
+
+(deffunction mkODate
+    (?baseYear ?baseMonth ?baseDay)
+    
+    ;First makes the date, then converts it to an Orthodox or Revised Julian date.
+    ;The Revised Julian calendar was implemented 13 October 1923 (Gregorian).
+    ;  cf. http://articles.adsabs.harvard.edu/full/seri/AN.../0220/0000203.000.html .
+    
+    ;To save time, only perform the computation, after the first occurrence of a date,
+    ; which differs from the Gregorian Calendar. In the Gregorian Calendar, 2800 is a leap year;
+    ; in the Revised Julian or Milankovic Calendar it is not.
+    (if (>= ?baseYear 2800) then
+	(bind ?iTempCJDN (pGregorianToCJDN ?baseYear ?baseMonth ?baseDay))
+	(return (pCJDNToMilankovic ?iTempCJDN))
+    )
+)
+
+(deffunction mkJDate
+    (?baseYear ?baseMonth ?baseDay)
+    
+   ;First makes the date, then converts it to a Julian date.
+    (bind ?iTempCJDN (pGregorianToCJDN ?baseYear ?baseMonth ?baseDay))
+    (return (pCJDNToJulian ?iTempCJDN))
+
+)
+
+(deffunction mkDateForCurrentCal
+    (?baseYear ?baseMonth ?baseDay)
+    ;Converts the parameters to a date in the chosen EDM calendar
+    (if (= ?*EDM* ?*iEDM_WESTERN*) then
+        (return (mkDate ?baseYear ?baseMonth ?baseDay))
+    else
+        (if (= ?*EDM* ?*iEDM_ORTHODOX*) then
+            (return (mkODate ?baseYear ?baseMonth ?baseDay))
+        else
+            (if (= ?*EDM* ?*iEDM_JULIAN*) then
+                (return (mkJDate ?baseYear ?baseMonth ?baseDay))
+            )
+        )
+    )
 )
