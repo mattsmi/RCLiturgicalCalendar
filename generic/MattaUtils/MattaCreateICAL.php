@@ -76,8 +76,9 @@ function pCreateICAL($iYear, $sLang, $iEDM, $sCalendarChosen, $sRCorByz) {
 			$stmt2->execute ();
 			$result2 = $stmt2->fetch ();
 			
-			// Begin the output for the individual event
-			if ($result2 ['PrintOnCal']) {
+			// Begin the output for the individual event,
+			//  if it should be printed and it has a name -- i.e. it is not a place-holder record.
+			if (($result2 ['PrintOnCal']) && ($result2['Short_name_en'])) {
 				// Create the body of the event description
 				$sBody = "";
 				// Full nameof feast and its liturgical rank
