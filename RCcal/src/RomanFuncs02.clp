@@ -18,45 +18,57 @@
         (return nil)
     )
 
+    ;Using the formula by Jean Meeus in his book Astronomical Algorithms (1991, p. 69)
     (if (or (= ?imMethod ?*iEDM_JULIAN*) (= ?imMethod ?*iEDM_ORTHODOX*)) then
-        ;Using the formula by Jean Meeus in his book Astronomical Algorithms (1991, p. 69)
         (bind ?iA (mod ?imYear 4))
         (bind ?iB (mod ?imYear 7))
         (bind ?iC (mod ?imYear 19))
         (bind ?iD (mod (+ (* 19 ?iC) 15) 30))
         (bind ?iE (mod (+ (- (+ (* 2 ?iA) (* 4 ?iB)) ?iD) 34) 7))
-        (bind ?iMonth (floor (/ (+ ?iD ?iE 114) 31)))
-        (bind ?iDay (+ (mod (+ ?iD ?iE 114) 31) 1))
+        (bind ?iTemp (+ ?iD ?iE 114))
+        (bind ?iF (div ?iTemp 31))
+        (bind ?iG (mod ?iTemp 31))
+        (bind ?iMonth ?iF)
+        (bind ?iDay (+ ?iG 1))
         (bind ?dTemp (mkDate ?imYear ?iMonth ?iDay))
         (if (= ?imMethod ?*iEDM_ORTHODOX*) then
-            (bind ?iTemp (pJulianToCJDN ?imYear ?iMonth ?iDay))
-            (bind ?dTemp (pCJDNToMilankovic ?iTemp))
-            (return ?dTemp)
+            ;(bind ?iTemp (pJulianToCJDN ?imYear ?iMonth ?iDay))
+            ;(bind ?dTemp (pCJDNToMilankovic ?iTemp))
+            (bind ?iTemp (daysAdd ?dTemp (CalcDayDiffJulianCal ?dTemp)))
+            (return ?iTemp)
         else
             ;return Julian date for Easter
             (return ?dTemp)
         )
-    )
-    
-    (if (= ?imMethod ?*iEDM_WESTERN*) then
-        ;Using the Meeus/Jones/Butcher algorithm; Jean Meeus, Astronomical Algorithms (1991, pp. 67-68).
-        (bind ?iA (mod ?imYear 19))
-        (bind ?iB (floor (/ ?imYear 100)))
-        (bind ?iC (mod ?imYear 100))
-        (bind ?iD (floor (/ ?iB 4)))
-        (bind ?iE (mod ?iB 4))
-        (bind ?iF (floor (/ (+ ?iB 8) 25)))
-        (bind ?iG (floor (/ (+ (- ?iB ?iF) 1) 3)))
-        (bind ?iH (mod (- (+ (* 19 ?iA) ?iB 15) ?iD ?iG) 30))
-        (bind ?iI (floor (/ ?iC 4)))
-        (bind ?iK (mod ?iC 4))
-        (bind ?iL (mod (- (+ 32 (* 2 ?iE) (* 2 ?iI)) ?iH ?iK) 7))
-        (bind ?iM (floor (/ (+ ?iA (* 11 ?iH) (* 22 ?iL)) 451)))
-        (bind ?iMonth (floor (/ (- (+ ?iH ?iL 114) (* 7 ?iM)) 31)))
-        (bind ?iDay (+ (mod (- (+ ?iH ?iL 114) (* 7 ?iM)) 31) 1))
-        (bind ?dTemp (mkDate ?imYear ?iMonth ?iDay))
-        ;return Gregorian date for Easter
-        (return ?dTemp)
+    else
+        (if (= ?imMethod ?*iEDM_WESTERN*) then
+             ;From Ian Stewart's page of O'Beirne's formula:
+            ;   http://www.whydomath.org/Reading_Room_Material/ian_stewart/2000_03.html .
+            (bind ?iA (mod ?imYear 19))
+            ;;;   ?iA + 1 is the year’s Golden Number.
+            (bind ?iB (div ?imYear 100))
+            (bind ?iC (mod ?imYear 100))
+            (bind ?iD (div ?iB 4))
+            (bind ?iE (mod ?iB 4))
+            (bind ?iG (div (+ (* 8 ?iB) 13) 25))
+            (bind ?iH (mod (+ (- (- (+ (* 19 ?iA) ?iB) ?iD) ?iG) 15) 30))
+            ;;;   The year’s Epact is 23 – ?iH when ?iH is less than 24 and 53 – ?iH otherwise.
+            (bind ?iM (div (+ ?iA (* 11 ?iH)) 319))
+            (bind ?iJ (div ?iC 4))
+            (bind ?iK (mod ?iC 4))
+            (bind ?iL (mod (+ (+ (- (- (+ (* 2 ?iE) (* 2 ?iJ)) ?iK) ?iH) ?iM) 32) 7))
+            (bind ?iN (div (+ (+ (- ?iH ?iM) ?iL) 90) 25))
+            (bind ?iP (mod (+ (+ (+ (- ?iH ?iM) ?iL) ?iN) 19) 32))
+            ;;;   The year’s dominical letter can be found by dividing 2E + 2J – K by 7,
+            ;;;      and taking the remainder (a remainder of 0 is equivalent to the letter A,
+            ;;;      1 is equivalent to B, and so on.
+            (bind ?imDay ?iP)
+            (bind ?imMonth ?iN)
+            (bind ?dTemp (mkDate ?imYear ?imMonth ?imDay))
+            (return ?dTemp)
+        else
+            (return nil)
+        )
     )
 
 )
