@@ -14,7 +14,10 @@
 ;; as they are present in the driving Python script.
 ;(clear)
 ;(reset)
+;(defglobal ?*easter* = nil)
 ;(defglobal ?*calendarInUse* = "AU") ; could be nil, which means we only use the "GEN" calendar.
+;(defglobal ?*EDM* = 3)
+;(defglobal ?*yearSought* = 2015)
 
 ;;Batch script begins here.
 (load "RomanGlobals01.clp")
@@ -24,7 +27,6 @@
 (load "RomanRules01.clp")
 (run) ; execute now to instantiate the unset globals, such as the date of Easter
 (load "RomanFuncs03.clp")
-(load "RomanFuncs04.clp")
 (eval "(batch* \"CalendarGEN.clp\")")
 (eval "(batch* \"CalendarOTHER.clp\")")
 (eval "(batch* \"ReplacesInGen.clp\")")
@@ -34,7 +36,8 @@
 (run)
 
 ;;;Test output
-(defglobal ?*sFileName* = (str-cat "harry" (random) ".txt"))
+;(defglobal ?*sFileName* = (str-cat "harry" (random) ".txt"))
+;(defglobal ?*sFileName* = (str-cat "harry" ".txt"))
 ;(save-facts ?*sFileName* local RCcalThisYear)
 (printout t "{'Result': " "'FINIS'}" crlf)
 

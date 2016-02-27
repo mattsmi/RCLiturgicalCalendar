@@ -13,11 +13,7 @@ if (($sTempCallerPage != 'RCLitCal.html') && ($sTempCallerPage != 'GetRCLitCal.p
 	exit();
 }
 if (($sTempCallerPath != 'http://localhost/RCcal/RCLitCal.html') &&
-        ($sTempCallerPath != 'http://www.liturgy.guide/RCcal/RCLitCal.html') &&
-		($sTempCallerPath != 'http://liturgy.guide/RCcal/RCLitCal.html') &&
-    ($sTempCallerPath != 'http://localhost/RCcal/GetRCLitCal.php') &&
-        ($sTempCallerPath != 'http://www.liturgy.guide/RCcal/GetRCLitCal.php') &&
-		($sTempCallerPath != 'http://liturgy.guide/RCcal/GetRCLitCal.php'))
+    ($sTempCallerPath != 'http://localhost/RCcal/GetRCLitCal.php'))
 {
 	//Force 404 error by seeking a non-existant dummy page.
 	$host = $_SERVER['HTTP_HOST'];
@@ -99,26 +95,65 @@ if($GLOBALS['iMonth'] == 1) {
 		#fetch() returns False, if there is no data found.
 		$bGenerateCalData = True;
 	}
+
 	if ($bGenerateCalData) {
 		//Initialise all that is needed.
-		//   Should initialise ONLY after base data in $GLOBALS .
-		$arrDataToPass = array('(defglobal ?*yearSought* = ' . $GLOBALS['iYearSought'] . ')', '(defglobal ?*EDM* = 3)', '(defglobal ?*calendarInUse* = "' . $GLOBALS['sCalendarChosen'] . '")');
-		$GLOBALS['sSourceDir'] = joinPaths($GLOBALS['sTOPDIR'],'src');
-		#$sPythonScript = joinPaths($GLOBALS['sSourceDir'], 'RCcalCLIPS.py');
-		#$oResult = shell_exec('python ' . $sPythonScript . ' ' . escapeshellarg(json_encode($arrDataToPass)));
-		#$oResult = shell_exec('python ' . $sPythonScript);
+		ini_set('max_execution_time', 0);
+		$ctx = array(); // This is the context of the clips
+		clips_init($ctx);
+
+		ob_start(); #Turn on output buffering to capture CLIPS command outputs.
+		//Initial data required.
+		clips_exec('(clear)', false);
+		clips_exec('(reset)', false);
+		clips_exec('(defglobal ?*EDM* = ' . $GLOBALS['iEDM'] . ')', false);
+		clips_exec('(defglobal ?*yearSought* = ' . $GLOBALS['iYearSought'] . ')', false);
+		clips_exec('(defglobal ?*calendarInUse* = "' . $GLOBALS['sCalendarChosen'] . '")', false);
+
+		chdir('./src');
+
+		clips_exec('(eval "(batch* \"' . getcwd() . '/RomanCal00.clp\")")', false);
+		ob_end_clean(); #Clear output buffer and cease buffering.
+		#chdir('..');
+		$arrFacts = array();
+		clips_query_facts($arrFacts, 'RCcalThisYear');
 		
-		$oContext = new ZMQContext();
-		$oZMQClient = new ZMQSocket($oContext, ZMQ::SOCKET_REQ);
-		$oZMQClient->connect("tcp://localhost:5556");
-		$oZMQClient->send(json_encode($arrDataToPass));
+		//wrap all inserts into a single transaction
+		$sTempSQL = "begin transaction";
+		$stmt = $GLOBALS ['dbRomanCal']->prepare ( $sTempSQL );
+		$stmt->execute ();
+		//insert the values into the table
+		foreach ($arrFacts as $arrDayFacts) {
+			//for each day of the year in summaryDayFact
+			$sCols = '';
+			$sValues = '';
+				
+			foreach ($arrDayFacts as $sKey => $sValue) {
+				if (strlen($sValue) > 0) {
+					if (($sKey != '__template__') && ($sKey != 'Date_this_year')) {
+						if ($sKey == 'Date_ISO8601') {
+							$sCols .= 'Date_this_year, ';
+							$sValues .= "'$sValue', ";
+						} else {
+							$sCols .= "'$sKey', ";
+							$sValues .= "'$sValue', ";
+						}
+					}
+				}
+			}
+				
+			$sNCols = mb_substr($sCols,0,-2,'UTF-8'); // get rid of the last comma and whitespace
+			$sNValues = mb_substr($sValues,0,-2,'UTF-8'); // get rid of the last comma and whitespace
+			$sTempSQL = "insert into RCcalThisYear (" . $sNCols . ") values (" . $sNValues . ");";
+			//echo($sTempSQL); #For debug
+			$stmt = $GLOBALS ['dbRomanCal']->prepare ( "$sTempSQL" );
+			$stmt->execute ();
+		}
+		//finalise the transaction
+		$sTempSQL = "commit transaction";
+		$stmt = $GLOBALS ['dbRomanCal']->prepare ( $sTempSQL );
+		$stmt->execute ();
 		
-		#await the response
-		$oResult = $oZMQClient->recv();
-		
-		#echo($oResult . "\n");
-		#$oResultData = json_decode($oResult, true);
-		#var_dump($oResultData);
 	}
 }
 

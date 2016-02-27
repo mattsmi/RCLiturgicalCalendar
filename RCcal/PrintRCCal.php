@@ -29,22 +29,21 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 	echo ('<html lang="' . $sLang . '">' . "\n");
 	echo ('<head>' . "\n");
 	echo ('<meta charset="utf-8">' . "\n");
+	echo ('<meta http-equiv="X-UA-Compatible" content="IE=edge">' . "\n");
+	echo ('<meta name="viewport" content="width=device-width, initial-scale=1">' . "\n");
 	echo ('<title>Roman Catholic Liturgical Calendar</title>' . "\n");
 	echo ('<link rel="stylesheet" href="../generic/css/monthcal.css">' . "\n");
 	
 	echo ('<!-- Basic Twitter Bootstrap stylesheet -->' . "\n");
 	echo ('<link rel="stylesheet" href="../generic/css/bootstrap.min.css">' . "\n\n");
 	echo ('<!-- Theme stylesheet -->' . "\n");
-	echo ('<link rel="stylesheet" href="../generic/css/bootstrap-theme.css">' . "\n\n");
+	echo ('<link rel="stylesheet" href="../generic/css/bootstrap-theme.min.css">' . "\n\n");
 	
 	echo ('<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->' . "\n");
 	echo ('<!--[if lt IE 9]>' . "\n");
 	echo ('<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>' . "\n");
 	echo ('<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>' . "\n");
     echo ('<![endif]-->' . "\n");
-	
-	echo ('<!-- Proper rendering and touch zooming -->' . "\n");
-	echo ('<meta name="viewport" content="width=device-width, initial-scale=1">' . "\n");
 	
 	echo ("<script>\n");
 	echo ('function submitSpecificMonth(iMonthWanted) {' . "\n");

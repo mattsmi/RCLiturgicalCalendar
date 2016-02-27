@@ -11,14 +11,14 @@ Several general and local calendars are supported today:
  - Scotland
  - Wales.
 
-There are several technologies in use for this solution. It needn't be so complex, if you are only interested in the data. The complexity comes about in presenting the information and automating the generation of the calendar based on the rule set.
+There are several technologies in use for this solution. 
 
 The CLIPS globals, templates, functions, facts, and rules hold all the necessary information and can be used stand-alone within a CLIPS environment (or command-line interface). The resultant facts ("RCcalThisYear") represent all celebrations for the year based on the local calendar and language chosen.
 
 To implement the whole system as it is today, you will need:
- - PHP 5 with at least the SQLite and ZMQ packages
- - Python 2.6 or 2.7 with both the PyCLIPS and ZMQ packages \(on Debian systems: python-clips and python-zmq\).
+ - PHP 5 with at least the SQLite
+ - [php-clips](https://github.com/guitarpoet/php-clips.git).
 
-I have also set up a cron job to check whether the Python ZMQ server is still running, and to relaunch it, if it is not running. Another weekly job kills the Python ZMQ server process to allow the system to clean up.
+Earlier versions of this system used Python and ZMQueue--neither is now required.
 
 A running copy of the system can be found here: [Roman Catholic Liturgical Calendar](http://www.liturgy.guide/RCcal/RCLitCal.html).

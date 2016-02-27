@@ -16,27 +16,52 @@
     (assert (phase-01-globals))
 )
 (defrule checkEasterDatingMethod
-	(declare (salience ?*highest-priority*))
-        (phase-01-globals)
-	(test (not (member$ EDM (get-defglobal-list))))
-	=>
-        ;If it hasn't been set, set it to a reasonable default; i.e., Western Easter (Gregorian Calendar).
-	(build "(defglobal ?*EDM* = ?*iEDM_WESTERN*)")
+    (declare (salience ?*highest-priority*))
+    (phase-01-globals)
+    (test (not (member$ EDM (get-defglobal-list))))
+    =>
+    ;If it hasn't been set, set it to a reasonable default; i.e., Western Easter (Gregorian Calendar).
+    (build "(defglobal ?*EDM* = ?*iEDM_WESTERN*)")
+)
+(defrule checkEasterDatingMethodNotNULL
+    (declare (salience ?*highest-priority*))
+    (phase-01-globals)
+    (test (and (member$ EDM (get-defglobal-list)) (eq (eval (sym-cat "?*" "EDM" "*")) nil)))
+    
+    =>
+    ;If it hasn't been set, set it to a reasonable default; i.e., Western Easter (Gregorian Calendar).
+    (build "(defglobal ?*EDM* = ?*iEDM_WESTERN*)")
 )
 (defrule checkTheYearInQuestion
-	(declare (salience ?*highest-priority*))
-        (phase-01-globals)
-	(test (not (member$ yearSought (get-defglobal-list))))
-	=>
-        ;CLIPS cannot determine the system date, so this is a reasonable assumption.
-	(build "(defglobal ?*yearSought* = 2014)")
+    (declare (salience ?*highest-priority*))
+    (phase-01-globals)
+    (test (not (member$ yearSought (get-defglobal-list))))
+    =>
+    ;CLIPS cannot determine the system date, so this is a reasonable assumption.
+    (build "(defglobal ?*yearSought* = 2015)")
+)
+(defrule checkTheYearInQuestionNotNULL
+    (declare (salience ?*highest-priority*))
+    (phase-01-globals)
+    (test (and (member$ yearSought (get-defglobal-list)) (eq (eval (sym-cat "?*" "yearSought" "*")) nil)))
+    =>
+    ;In case we had to initialise the run with a nil value.
+    ;CLIPS cannot determine the system date, so this is a reasonable assumption.
+    (build "(defglobal ?*yearSought* = 2015)")
 )
 (defrule checkEaster
-	(declare (salience ?*higher-priority*))
-        (phase-01-globals)
-	(test (not (member$ easter (get-defglobal-list))))
-	=>
-	(build "(defglobal ?*easter* = (F10_CalcEaster ?*yearSought* ?*EDM*))")
+    (declare (salience ?*higher-priority*))
+    (phase-01-globals)
+    (test (not (member$ easter (get-defglobal-list))))
+    =>
+    (build "(defglobal ?*easter* = (F10_CalcEaster ?*yearSought* ?*EDM*))")
+)
+(defrule checkEasterNotNULL
+    (declare (salience ?*higher-priority*))
+    (phase-01-globals)
+    (test (and (member$ easter (get-defglobal-list)) (eq (eval (sym-cat "?*" "easter" "*")) nil)))
+    =>
+    (build "(defglobal ?*easter* = (F10_CalcEaster ?*yearSought* ?*EDM*))")
 )
 (defrule firstSundayOfAdvent
     (declare (salience ?*high-priority*))

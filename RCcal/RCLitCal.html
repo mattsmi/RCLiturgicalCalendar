@@ -1,7 +1,9 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Roman Catholic Liturgical Calendar</title>
 
@@ -9,7 +11,7 @@
 <link rel="stylesheet" href="../generic/css/bootstrap.min.css">
 
 <!-- Theme stylesheet -->
-<link rel="stylesheet" href="../generic/css/bootstrap-theme.css">
+<link rel="stylesheet" href="../generic/css/bootstrap-theme.min.css">
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -17,19 +19,26 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-<!-- Proper rendering and touch zooming -->
-<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script>
-	var iThisYear = new Date().getFullYear();
-	var iNextYear = iThisYear + 1;
-	var iNext2Year = iThisYear + 2;
-	var iNext3Year = iThisYear + 3;
-	var iNext4Year = iThisYear + 4;
-	var iNext5Year = iThisYear + 5;
-</script>
-<script>
+var iThisYear = new Date().getFullYear();
+var iNextYear = iThisYear + 1;
+var iNext2Year = iThisYear + 2;
+var iNext3Year = iThisYear + 3;
+var iNext4Year = iThisYear + 4;
+var iNext5Year = iThisYear + 5;
+
 	function bodyLoad() {
+		document.getElementById("WaitMessage").style.visibility = "hidden";
+		//Prepare the dropdown
+		var oYears = [iThisYear, iNextYear, iNext2Year, iNext3Year, iNext4Year, iNext5Year];
+	    oSelected = document.getElementById( 'dateMenu' );
+		for ( oYear in oYears ) {
+		    oSelected.add( new Option( oYears[oYear] ) );
+		};
+		document.getElementById('dateMenu').options[0].selected = true;
+	}
+	function bodyUnLoad() {
 		document.getElementById("WaitMessage").style.visibility = "hidden";
 	}
 	function pleaseWait(bDoICAL) {
@@ -50,49 +59,19 @@
 		<h2>for the Liturgy of the Latin Rite of the Roman Catholic
 			Church</h2>
 
-		<form class="form-horizontal" role="form" id="formCalSubmit"
+		<form class="form-horizontal" id="formCalSubmit"
 			method="post" action="GetRCLitCal.php">
 			<div class="form-group">
 				<label for="dateMenu" class="col-sm-2 control-label">Year of
 					Calendar</label>
-				<div class="col-sm-10">
+				<div class="col-sm-5">
 					<select name="dateMenu" id="dateMenu" class="form-control">
-						<script>
-									document
-											.write("<option value=\"" + iThisYear + "\"select>"
-													+ iThisYear + "</option>")
-								</script>
-						<script>
-									document
-											.write("<option value=\"" + iNextYear + "\">"
-													+ iNextYear + "</option>")
-								</script>
-						<script>
-									document
-											.write("<option value=\"" + iNext2Year + "\">"
-													+ iNext2Year + "</option>")
-								</script>
-						<script>
-									document
-											.write("<option value=\"" + iNext3Year + "\">"
-													+ iNext3Year + "</option>")
-								</script>
-						<script>
-									document
-											.write("<option value=\"" + iNext4Year + "\">"
-													+ iNext4Year + "</option>")
-								</script>
-						<script>
-									document.write(
-											"<option value=\"" + iNext5Year + "\">"
-													+ iNext5Year + "</option>")
-								</script>
 					</select>
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="langMenu" class="col-sm-2 control-label">Language</label>
-				<div class="col-sm-10">
+				<div class="col-sm-5">
 					<select name="langMenu" id="langMenu" class="form-control">
 						<option value="en" selected>English</option>
 						<option value="la">Latin</option>
@@ -102,7 +81,7 @@
 			<div class="form-group">
 				<label for="calMenu" class="col-sm-2 control-label">Local or
 					General Calendar</label>
-				<div class="col-sm-10">
+				<div class="col-sm-5">
 					<select name="calMenu" id="calMenu" class="form-control">
 						<option value="GEN" selected>
 						General Roman Calendar</option>
@@ -140,14 +119,14 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-10">
+				<div class="col-sm-offset-2 col-sm-5">
 					<button class="btn btn-default" id="getYearlyCalendar"
 						onclick="pleaseWait('0')" type="submit">Display Yearly
 						Calendar</button>
 				</div>
 			</div>
 			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-10">
+				<div class="col-sm-offset-2 col-sm-5">
 					<button class="btn btn-default" id="getRCiCal"
 						onclick="pleaseWait('1')" type="submit">Download iCalendar of Feasts</button>
 				</div>
