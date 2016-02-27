@@ -22,3 +22,6 @@ To implement the whole system as it is today, you will need:
 Earlier versions of this system used Python and ZMQueue--neither is now required.
 
 A running copy of the system can be found here: [Roman Catholic Liturgical Calendar](http://www.liturgy.guide/RCcal/RCLitCal.html).
+
+Lastly, ensure there is write permission to both the `data` directory and the `RomanKeys.db3` database. The requirement for the directory is a PHP quirk/gift.
+

@@ -17,7 +17,7 @@
 ;(defglobal ?*easter* = nil)
 ;(defglobal ?*calendarInUse* = "AU") ; could be nil, which means we only use the "GEN" calendar.
 ;(defglobal ?*EDM* = 3)
-;(defglobal ?*yearSought* = 2015)
+;(defglobal ?*yearSought* = 2016)
 
 ;;Batch script begins here.
 (load "RomanGlobals01.clp")
@@ -39,5 +39,5 @@
 ;(defglobal ?*sFileName* = (str-cat "harry" (random) ".txt"))
 ;(defglobal ?*sFileName* = (str-cat "harry" ".txt"))
 ;(save-facts ?*sFileName* local RCcalThisYear)
-(printout t "{'Result': " "'FINIS'}" crlf)
+;(printout t "{'Result': " "'FINIS'}" crlf)
 

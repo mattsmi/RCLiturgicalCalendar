@@ -12,8 +12,13 @@ if (($sTempCallerPage != 'RCLitCal.html') && ($sTempCallerPage != 'GetRCLitCal.p
 	header("Location: http://$host$uri/$dummypage");
 	exit();
 }
+/*
 if (($sTempCallerPath != 'http://localhost/RCcal/RCLitCal.html') &&
-    ($sTempCallerPath != 'http://localhost/RCcal/GetRCLitCal.php'))
+        ($sTempCallerPath != 'http://www.liturgy.guide/RCcal/RCLitCal.html') &&
+		($sTempCallerPath != 'http://liturgy.guide/RCcal/RCLitCal.html') &&
+    ($sTempCallerPath != 'http://localhost/RCcal/GetRCLitCal.php') &&
+        ($sTempCallerPath != 'http://www.liturgy.guide/RCcal/GetRCLitCal.php') &&
+		($sTempCallerPath != 'http://liturgy.guide/RCcal/GetRCLitCal.php'))
 {
 	//Force 404 error by seeking a non-existant dummy page.
 	$host = $_SERVER['HTTP_HOST'];
@@ -22,6 +27,7 @@ if (($sTempCallerPath != 'http://localhost/RCcal/RCLitCal.html') &&
 	header("Location: http://$host$uri/$dummypage");
 	exit();
 }
+ */
 define('page_include_allowed', TRUE);
 
 //set the default timezone
@@ -51,7 +57,7 @@ $GLOBALS['bDoICAL'] = $_POST[ "iCalMenu" ];
 MattaInitialise();
 
 //Open up the databases required.
-$GLOBALS['dbRomanCal'] = MattaOpenSQLiteDB($GLOBALS['sDataDir'], 'RCcalData.db3');
+$GLOBALS['dbRomanCal'] = MattaOpenSQLiteDB($GLOBALS['sDataDir'], 'RomanKeys.db3');
 $GLOBALS['dbMelkTexts'] = MattaOpenSQLiteDB($GLOBALS['sDataDir'], 'MelkiteTexts.db3');
 
 //Some checking and set-up functions only required for the first month of the year

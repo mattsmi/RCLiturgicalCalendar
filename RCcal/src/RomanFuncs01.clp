@@ -714,6 +714,20 @@
             )
         )
     )
+	
+	;Now count the days within the month.
+    ;   We add two to the result: one for the day from midnight; one because we count starting from one not zero.
+    (bind ?iDay (+ (div ?iCounter (* 24 60 60)) 0)) ; ignore the time of day.
+    (if (> (mod ?iCounter (* 24 60 60)) 0) then
+        (bind ?iDay (+ ?iDay 1))
+    )
+	
+	;Correction for landing on the boundary of leap years
+	(if (and (= ?iMonth 1) (= ?iDay 0)) then
+		(bind ?iMonth 12)
+		(bind ?iDay 31)
+	)
+	
     (bind ?sMonth (str-cat "000" ?iMonth))
     (if (= (str-length ?sMonth) 5) then
         (bind ?sMonth (sub-string 4 5 ?sMonth))
@@ -722,12 +736,7 @@
     )
     (bind ?sTempDate (str-cat ?sTempDate "-" ?sMonth "-"))
     
-    ;Now count the days within the month.
-    ;   We add two to the result: one for the day from midnight; one because we count starting from one not zero.
-    (bind ?iDay (+ (div ?iCounter (* 24 60 60)) 0)) ; ignore the time of day.
-    (if (> (mod ?iCounter (* 24 60 60)) 0) then
-        (bind ?iDay (+ ?iDay 1))
-    )
+    
     (bind ?sDay (str-cat "000" ?iDay))
     (if (= (str-length ?sDay) 5) then
         (bind ?sDay (sub-string 4 5 ?sDay))
