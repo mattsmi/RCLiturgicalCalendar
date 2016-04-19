@@ -95,18 +95,20 @@ var iNext5Year = iThisYear + 5;
 					</select>
 				</div>
 			</div>
-			<div class="hidden">
-				<div class="form-group">
-					<select name="monthMenu" id="monthMenu" class="form-control">
-						<option value="1" selected>January</option>
+			<div class="form-group">
+				<label for="edmMenu" class="col-sm-2 control-label">Easter
+					Dating Method</label>
+				<div class="col-sm-5">
+					<select name="edmMenu" id="edmMenu" class="form-control">
+						<option value="1">Julian calendar (e.g. Middle East)</option>
+						<option value="3" selected>Gregorian calendar (universal Church)</option>
 					</select>
 				</div>
 			</div>
 			<div class="hidden">
 				<div class="form-group">
-					<select name="edmMenu" id="edmMenu" class="form-control">
-						<option value="3" selected>Western Church (Gregorian
-							Easter)</option>
+					<select name="monthMenu" id="monthMenu" class="form-control">
+						<option value="1" selected>January</option>
 					</select>
 				</div>
 			</div>
@@ -138,6 +140,10 @@ var iNext5Year = iThisYear + 5;
 		<div id="WaitMessage" class="alert-danger">
 			<h1>Please wait a second or two for the calculation ...</h1>
 		</div>
+		<h4>Easter Dating Method</h4>
+		<p>In some countries of the Middle East, the Catholic Church permits Easter and its dependent
+		movable feasts to be celebrated alongside her sister Orthodox Churches using the Julian calendar. Feasts 
+		of the sanctoral cycle &mdash; fixed feasts &mdash; continue to follow the Gregorian calendar.</p>
 		<h4>iCalendar</h4>
 		<p>iCalendar (often known simply as 'iCal') is a <a href="http://tools.ietf.org/html/rfc5545">standard calendar format</a> 
 		that enables users to create and share

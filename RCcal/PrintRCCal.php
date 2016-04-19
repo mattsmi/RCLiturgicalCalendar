@@ -16,12 +16,12 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 	
 	// The table to use for source data varies according to the Easter Dating Method
 	if ($iEDM == 2) {
-		$CalTable = "OrthodoxCal";
+		$sCalType = "Orthodox calendar";
 	} elseif ($iEDM == 1) {
-		$CalTable = "JulianCal";
+		$sCalType = "Julian calendar";
 	} else {
 		// default value is Western Easter
-		$CalTable = "Cal";
+		$sCalType = "Gregorian calendar";
 	}
 	
 	// Write out the page header
@@ -82,7 +82,7 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 	
 	// Month header
 	$sTemp = pFormatMonthYearDate ( $dMonthStart, $sLang );
-	echo ('<h2>' . $sTemp . '&#xA0;&#xA0;&#xA0;' . $sCalendarChosen . '</h2>');
+	echo ('<h2>' . $sTemp . '&#xA0;&#xA0;&#xA0;' . $sCalendarChosen . '&#xA0;&#xA0;&#xA0;' . $sCalType . '</h2>');
 	echo ('<ul  class="calendar-menu">');
 	echo ('<li><a href="javascript: submitSpecificMonth(\'1\')">' . pFormatMonthFromNum(1, $sLang) . '</a></li>');
 	echo ('<li><a href="javascript: submitSpecificMonth(\'2\')">' . pFormatMonthFromNum(2, $sLang) . '</a></li>');
@@ -131,7 +131,7 @@ function pPrintRCCalendar($iYear, $iMonth, $sLang, $iEDM, $sCalendarChosen) {
 	
 	// Retrieve all records for the given month of the given year
 	echo ("<tbody>\n");
-	$sTempSQL = "select * from RCcalThisYear where (Date_this_year like '" . $sMonthDate . "%') and (ForWhichCal = '" . $sCalendarChosen . "') order by Date_this_year asc";
+	$sTempSQL = "select * from RCcalThisYear where (Date_this_year like '" . $sMonthDate . "%') and (EDM = " . $GLOBALS['iEDM'] . ") and (ForWhichCal = '" . $sCalendarChosen . "') order by Date_this_year asc";
 	$stmt = $GLOBALS ['dbRomanCal']->prepare ( $sTempSQL );
 	$stmt->execute ();
 	$result = $stmt->fetchAll ();

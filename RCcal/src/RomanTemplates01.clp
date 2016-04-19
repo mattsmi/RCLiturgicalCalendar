@@ -14,6 +14,7 @@
  (slot AbstinenceToday (default nil))
  (slot ForWhichCal (default nil))
  (slot PsalterWeek (default nil))
+ (slot EDM (default nil))
 )
 (deftemplate YearlyCycle
  (slot Year (default ?NONE))
@@ -124,4 +125,3 @@
 ; (slot CalType (default nil))
 ; (slot ReplacesInGEN (default nil))
 ;)
-
