@@ -15,6 +15,7 @@
  (slot ForWhichCal (default nil))
  (slot PsalterWeek (default nil))
  (slot EDM (default nil))
+ (slot PrintOnCal (default nil))
 )
 (deftemplate YearlyCycle
  (slot Year (default ?NONE))

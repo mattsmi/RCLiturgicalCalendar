@@ -59,7 +59,7 @@
     =>
     ;In case we had to initialise the run with a nil value.
     ;CLIPS cannot determine the system date, so this is a reasonable assumption.
-    (build "(defglobal ?*yearSought* = 2015)")
+    (build "(defglobal ?*yearSought* = 2016)")
 )
 (defrule checkEaster
     (declare (salience ?*higher-priority*))
